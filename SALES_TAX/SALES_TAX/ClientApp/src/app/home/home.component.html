@@ -1,0 +1,124 @@
+
+<dx-data-grid id="gridContainer"
+              [dataSource]="salesList"
+              keyExpr="id"
+              (onToolbarPreparing)="onToolbarPreparing($event)"
+              [showBorders]="true">
+
+  <dxo-filter-row [visible]="true"
+                  [applyFilter]="true"></dxo-filter-row>
+  <dxo-header-filter [visible]="true"></dxo-header-filter>
+  <dxo-search-panel [visible]="true"
+                    [width]="240"
+                    placeholder="Search..."></dxo-search-panel>
+
+  <dxi-column dataField="name" alignment="center" dataType="string" caption="Item Name">
+
+  </dxi-column>
+  <dxi-column dataField="price" alignment="right" dataType="number" caption="Price"> </dxi-column>
+  <dxi-column dataField="quantity" alignment="right" dataType="number" caption="Quantity"> </dxi-column>
+  <dxi-column caption="Imported" cellTemplate="importTemplate"></dxi-column>
+  <dxi-column dataField="total" alignment="right" dataType="number" caption="Total"> </dxi-column>
+  <dxo-summary>
+    <dxi-total-item column="total" summaryType="custom" displayFormat="Total: {{totalAmount}}"
+                    showInColumn="total"> </dxi-total-item>
+
+  </dxo-summary>
+
+  <div *dxTemplate="let cellData of 'importTemplate'">
+    <dx-check-box [readOnly]="true" [value]="cellData.data.imported"></dx-check-box>
+  </div>
+
+</dx-data-grid>
+<dx-popup [width]="'auto'"
+          [height]="'auto'"
+          [showTitle]="true"
+          [title]="'Sales Tax'"
+          [dragEnabled]="true"
+          [dir]="'ltr'"
+          [closeOnOutsideClick]="false"
+          [showCloseButton]="false"
+          [position]="{at:'center'}"
+          contentTemplate="popupContent"
+          [(visible)]="showSalesTaxPopup">
+  <div *dxTemplate="let data of 'popupContent'" class="custom-popup-width" [dir]="ltr">
+    <dx-scroll-view width="100%" height="100%">
+      <form (submit)="addItem(false,saleTaxForm)">
+        <dx-form id="saleTaxForm" #saleTaxForm name="saleTaxForm"
+                 [formData]="model"
+                 [readOnly]="false"
+                 [dir]="'ltr'"
+                 [showColonAfterLabel]="false"
+                 [showValidationSummary]="false"
+                 validationGroup="salesTaxForm">
+          <dxi-item [editorOptions]="{ width: '100%'}" class="pull-right">
+
+            <div *dxTemplate>
+              <div *ngIf="model.Invalid" class="dx-item-content dx-validationsummary-item-content">Please enter the required data</div>
+              <div *ngIf="error.show==true" class="dx-item-content dx-validationsummary-item-content">{{error.message}}</div>
+            </div>
+          </dxi-item>
+          <dxi-item icon="message" editorType="dxSelectBox" caption="Item">
+            <dxo-label alignment="end" text="Item" style="text-align:end"> </dxo-label>
+            <div *dxTemplate>
+              <dx-select-box [(value)]="model.id" (onSelectionChanged)="onSelectionChanged($event,model.id)" [dataSource]="products" valueExpr="id" displayExpr="name"></dx-select-box>
+
+            </div>
+            <dxi-validation-rule type="required" message="please select the item"></dxi-validation-rule>
+          </dxi-item>
+
+
+          <dxi-item [editorOptions]="{ width: '100%'}" class="pull-right">
+            <dxo-label alignment="end" text="Price/Unit" style="text-align:end"> </dxo-label>
+            <div *dxTemplate>
+              {{model.price}}
+            </div>
+          </dxi-item>
+
+
+          <dxi-item dataField="quantity" caption="Quantity">
+
+
+
+            <dxo-label alignment="end" text="Quantity" style="text-align:end"> </dxo-label>
+            <div *dxTemplate>
+              <dx-number-box [(value)]="model.quantity"
+                             [min]="1"
+                             [max]="20"
+                             [showSpinButtons]="true"></dx-number-box>
+            </div>
+            <dxi-validation-rule type="required" message="please enter the quantity"></dxi-validation-rule>
+          </dxi-item>
+
+          <dxi-item dataField="imported" caption="Imported">
+
+
+
+            <dxo-label alignment="end" text="Imported" style="text-align:end"> </dxo-label>
+            <div *dxTemplate>
+              <dx-check-box [(value)]="model.imported"></dx-check-box>
+
+            </div>
+          </dxi-item>
+
+
+
+          <dxi-item [editorOptions]="{ width: '100%'}" class="pull-right">
+
+
+            <dx-button text="Save & Add New" validationGroup="saleTaxForm" (onClick)="isValid(saleTaxForm,model)"
+                       [useSubmitBehavior]="true"></dx-button>
+            <dx-button text="Save & Close" [elementAttr]="{  class: 'margin-left-10px' }" validationGroup="saleTaxForm" (onClick)="addItem(true,saleTaxForm)"></dx-button>
+            <dx-button text="Cancel" [elementAttr]="{  class: 'margin-left-10px' }" (onClick)="OnClosePopup(saleTaxForm)"></dx-button>
+
+          </dxi-item>
+          <dxi-item [editorOptions]="{ width: '100%'}" class="pull-right">
+            &nbsp;
+          </dxi-item>
+        </dx-form>
+      </form>
+    </dx-scroll-view>
+  </div>
+
+</dx-popup>
+
